@@ -28,7 +28,7 @@ export default function Characters() {
     <>
       <h1>Characters from Rick and Morty</h1>
       {
-        isLoading ? <p>Loading...</p>
+        isLoading ? (<p>Loading...</p>)
         : (
           <div className={styles.container}>
             <div>
@@ -39,7 +39,6 @@ export default function Characters() {
                   <Link to={`${url}${character.id}`}>
                     <h4>{character.name}</h4>
                   </Link>
-                  
                 </li>
               ))}
               </ul>
