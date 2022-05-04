@@ -1,27 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Link, useHistory, useLocation } from 'react-router-dom';
+import { Link, Route, useRouteMatch, Switch } from 'react-router-dom';
+import Character from '../components/Character';
+import styles from '../App.css';
 
 export default function Characters() {
   const [characters, setCharacters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const history = useHistory();
-  const location = useLocation();
-  const status = new URLSearchParams(location.search).get('status') ?? 'all';
-
-  const handleStatusChange = (event) => {
-    history.push(`/?status=${event.target.value}`);
-  }
+  const { url, path } = useRouteMatch();
 
   useEffect(() => {
     const fetchCharacters = async () => {
-    const statusParam = new URLSearchParams(location.search).get('status');
 
-    const url =
-      statusParam === 'all' || !statusParam
-      ? 'https://rickandmortyapi.com/api/character'
-      : `https://rickandmortyapi.com/api/character?status=${statusParam}`;
-
-    const res = await fetch(url);
+    const res = await fetch('https://rickandmortyapi.com/api/character');
 
     const { results } = await res.json();
 
@@ -31,7 +21,7 @@ export default function Characters() {
     
       fetchCharacters();
     
-  }, [location.search]);
+  }, []);
 
 
   return (
@@ -40,24 +30,25 @@ export default function Characters() {
       {
         isLoading ? <p>Loading...</p>
         : (
-          <div>
-            <label htmlFor='status'>Character Status:</label>
-            <select name='status' id='status' value={status} onChange={handleStatusChange}>
-              <option value='all'>All</option>
-              <option value='alive'>Alive</option>
-              <option value='dead'>Dead</option>
-              <option value='unknown'>Unknown</option>
-            </select>
+          <div className={styles.container}>
             <div>
-              {characters.map((character) => (
-                <div key={character.id}>
-                  <Link to={`/characters/${character.id}`}>
+            <aside >
+              <ul>
+                {characters.map((character) => (
+                <li key={character.id}>
+                  <Link to={`${url}${character.id}`}>
                     <h4>{character.name}</h4>
                   </Link>
-                  <p>{character.status}</p>
-                  <img src={character.image}/>
-                </div>
+                  
+                </li>
               ))}
+              </ul>
+            </aside>
+            </div>
+            <div>
+            <Route path={`${path}:id`}>
+              <Character characters={characters}/>
+            </Route>
             </div>
           </div>
         )
